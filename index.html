@@ -1259,6 +1259,8 @@
             const easy = data.easySolved;
             const medium = data.mediumSolved;
             const hard = data.hardSolved;
+            const totalMedium = data.totalMedium;
+            const totalHard = data.totalHard;
             
             // Update total solved
             document.getElementById('leetcode-total-solved').textContent = total;
@@ -1271,13 +1273,13 @@
             
             // Update easy/medium/hard counts
             document.getElementById('leetcode-easy-count').textContent = easy + '/933';
-            document.getElementById('leetcode-medium-count').textContent = medium + '/2029';
-            document.getElementById('leetcode-hard-count').textContent = hard + '/916';
+            document.getElementById('leetcode-medium-count').textContent = medium + '/' + totalMedium;
+            document.getElementById('leetcode-hard-count').textContent = hard + '/' + totalHard;
             
             // Update progress bars
             document.getElementById('leetcode-easy-bar').style.width = ((easy / 933) * 100) + '%';
-            document.getElementById('leetcode-medium-bar').style.width = ((medium / 2029) * 100) + '%';
-            document.getElementById('leetcode-hard-bar').style.width = ((hard / 916) * 100) + '%';
+            document.getElementById('leetcode-medium-bar').style.width = ((medium / totalMedium) * 100) + '%';
+            document.getElementById('leetcode-hard-bar').style.width = ((hard / totalHard) * 100) + '%';
           }
         } catch (error) {
           console.log('Could not fetch LeetCode stats');
