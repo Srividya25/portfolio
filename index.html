@@ -1251,38 +1251,64 @@
       // Fetch LeetCode Stats dynamically
       async function fetchLeetCodeStats() {
         try {
-          const response = await fetch('https://leetcode-api.cyclic.app/api/Srividya25');
-          const data = await response.json();
+          const query = `
+            query {
+              matchedUser(username: "Srividya25") {
+                submitStatsGlobal {
+                  acSubmissionNum {
+                    difficulty
+                    count
+                  }
+                }
+              }
+            }
+          `;
           
-          if (data.totalSolved) {
-            const totalSolved = data.totalSolved;
-            const easySolved = data.easySolved;
-            const mediumSolved = data.mediumSolved;
-            const hardSolved = data.hardSolved;
-            
-            // Update total solved
-            document.getElementById('leetcode-total-solved').textContent = totalSolved;
-            
-            // Update circular progress
-            const maxSolved = 3878;
-            const progressPercent = (totalSolved / maxSolved) * 283;
-            const strokeOffset = 283 - progressPercent;
-            document.getElementById('leetcode-circular-progress').setAttribute('stroke-dashoffset', strokeOffset);
-            
-            // Update easy/medium/hard counts
-            document.getElementById('leetcode-easy-count').textContent = easySolved + '/933';
-            document.getElementById('leetcode-medium-count').textContent = mediumSolved + '/2029';
-            document.getElementById('leetcode-hard-count').textContent = hardSolved + '/916';
-            
-            // Update progress bars
-            document.getElementById('leetcode-easy-bar').style.width = ((easySolved / 933) * 100) + '%';
-            document.getElementById('leetcode-medium-bar').style.width = ((mediumSolved / 2029) * 100) + '%';
-            document.getElementById('leetcode-hard-bar').style.width = ((hardSolved / 916) * 100) + '%';
-          }
+          const response = await fetch('https://leetcode.com/graphql', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ query })
+          });
+          
+          const result = await response.json();
+          const submissions = result.data.matchedUser.submitStatsGlobal.acSubmissionNum;
+          
+          let total = 0, easy = 0, medium = 0, hard = 0;
+          submissions.forEach(item => {
+            total += item.count;
+            if (item.difficulty === 'Easy') easy = item.count;
+            if (item.difficulty === 'Medium') medium = item.count;
+            if (item.difficulty === 'Hard') hard = item.count;
+          });
+          
+          // Update total solved
+          document.getElementById('leetcode-total-solved').textContent = total;
+          
+          // Update circular progress
+          const maxSolved = 3878;
+          const progressPercent = (total / maxSolved) * 283;
+          const strokeOffset = 283 - progressPercent;
+          document.getElementById('leetcode-circular-progress').setAttribute('stroke-dashoffset', strokeOffset);
+          
+          // Update easy/medium/hard counts
+          document.getElementById('leetcode-easy-count').textContent = easy + '/933';
+          document.getElementById('leetcode-medium-count').textContent = medium + '/2029';
+          document.getElementById('leetcode-hard-count').textContent = hard + '/916';
+          
+          // Update progress bars
+          document.getElementById('leetcode-easy-bar').style.width = ((easy / 933) * 100) + '%';
+          document.getElementById('leetcode-medium-bar').style.width = ((medium / 2029) * 100) + '%';
+          document.getElementById('leetcode-hard-bar').style.width = ((hard / 916) * 100) + '%';
+          
         } catch (error) {
           console.log('Could not fetch LeetCode stats');
           // Keep default values if API fails
           document.getElementById('leetcode-total-solved').textContent = '359';
+          document.getElementById('leetcode-easy-count').textContent = '136/933';
+          document.getElementById('leetcode-medium-count').textContent = '214/2029';
+          document.getElementById('leetcode-hard-count').textContent = '9/916';
         }
       }
       
